@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Biblioteca</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"
+      integrity="sha384-fbbOQedDUMZZ5KreZpsbe1LCZPVmfTnH7ois6mU1QK+m14rQ1l2bGBq41eYeM/fS"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+
+        function deleteLivro(id){
+            if(confirm(`Você deseja realmente deletar o livro de ID ${id}`)){
+                removeLivro(id);                
+            }else{
+                alert("Operação Cancelada.")
+            }
+        }
+
+        async function removeLivro(id){
+            await axios
+            .delete(`http://localhost:5000/livro/${id}`)
+            .then(response=> {
+                alert(response.data)
+                listLivros();
+            })
+            .catch(error => {
+                alert(error.response.data)
+            });            
+        }
+
+        async function listLivros(){
+            document.getElementById('dados').innerHTML="";
+            axios.get('http://localhost:5000/livros')
+            .then( response => {
+                const dados = response.data;
+                if(dados.length <= 0){
+                    document.getElementById('dados').innerHTML+= `
+                    <tr>
+                        <th class='text-center' colspan="6"> Nenhum Livro Cadastrado! <a href='cadastrar_livros.html'>Clique aqui</a> para inserir um livro!</th>
+                    </tr>
+                    `;
+                }
+                dados.forEach(dado => {
+                    document.getElementById('dados').innerHTML+= `
+                    <tr>
+                        <th scope="row">${dado.id}</th>
+                        <td>${dado.titulo}</td>
+                        <td>${dado.isbn}</td>
+                        <td>${dado.editora}</td>
+                        <td>${dado.autor}</td>
+                        <td>
+                            <a class="btn btn-warning btn-sm" href="editar_livros.html?id=${dado.id}">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a class="btn btn-danger btn-sm" href="#" onclick="deleteLivro(${dado.id})">
+                                <i class="bi bi-trash-fill"></i>
+                            </a>
+                        </td>
+                </tr>
+                `;    
+                });
+                
+            })
+        }
+    </script>
+  </head>
+  <body onload="listLivros()">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Biblioteca</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" href="index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="livros.html">Livros</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">        
+        <nav class="navbar">
+            <div class="container-fluid">
+                <h2>Exibição de Livros</h2>
+                <div class="d-flex">                
+                    <a href="cadastrar_livros.html" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i>
+                        Inserir Livro
+                    </a>
+                </div>
+            </div>
+        </nav>
+        <table class="table table-striped m-3">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Titulo</th>
+                <th scope="col">ISBN</th>
+                <th scope="col">Editora</th>
+                <th scope="col">Autor</th>
+                <th scope="col">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="dados">                          
+            </tbody>
+          </table>
+    </div>
+  </body>
+</html>
+
